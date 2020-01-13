@@ -1,5 +1,5 @@
 # add all your cmd/<things> in here
-TARGETS = executable
+TARGETS = errnil
 
 
 CMD_DIR := ./cmd

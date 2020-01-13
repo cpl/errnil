@@ -1,10 +1,3 @@
-# Goose
+# errnil
 
-A barebone Golang template for when I (personally) start a new project.
-
-When using this, don't forget to modify the following:
-
-- [ ] LICENSE
-- [ ] docs/README.md
-- [ ] go.mod
-- [ ] cmd/
+Counter of `if err != nil` in your Golang code as a service.

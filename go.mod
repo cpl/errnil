@@ -1,3 +1,3 @@
-module cpl.li/go/goose
+module cpl.li/go/errnil
 
 go 1.13
