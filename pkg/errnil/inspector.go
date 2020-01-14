@@ -14,12 +14,12 @@ import (
 // an ast.BinaryExpr with a not-equals operation and two ast.Ident where one must be `nil` and the other must be named
 // `err`. This does not check that `err` is of type `error`, so any variable named `err` is counted and any variable
 // that is an `error` but named something else, is skipped.
-func Inspect(path string) (positions []token.Position, err error) {
+func Inspect(path string) (positions []Position, err error) {
 	return inspect(path)
 }
 
-func inspect(path string) ([]token.Position, error) {
-	var positions []token.Position
+func inspect(path string) ([]Position, error) {
+	var positions []Position
 
 	if err := filepath.Walk(path, func(p string, f os.FileInfo, err error) error {
 		if f.IsDir() || stdpath.Ext(f.Name()) != ".go" {
@@ -44,7 +44,7 @@ func inspect(path string) ([]token.Position, error) {
 	return positions, nil
 }
 
-func extractPositions(tokenSet *token.FileSet, astFp *ast.File) (positions []token.Position) {
+func extractPositions(tokenSet *token.FileSet, astFp *ast.File) (positions []Position) {
 	ast.Inspect(astFp, func(node ast.Node) bool {
 		switch n := node.(type) {
 		case *ast.BinaryExpr:
@@ -61,8 +61,9 @@ func extractPositions(tokenSet *token.FileSet, astFp *ast.File) (positions []tok
 			}
 
 			if (x.Name == "err" && y.Name == "nil") || (x.Name == "nil" && y.Name == "err") {
-				pos := tokenSet.PositionFor(n.Pos(), true)
-				positions = append(positions, pos)
+				positions = append(positions,
+					positionFromTokenPosition(
+						tokenSet.PositionFor(n.Pos(), true)))
 			}
 		}
 

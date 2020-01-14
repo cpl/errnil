@@ -1,7 +1,6 @@
 package main // import "cpl.li/go/errnil/cmd/errnil"
 
 import (
-	"go/token"
 	"log"
 	"net/http"
 	"os"
@@ -56,7 +55,7 @@ func main() {
 	log.Fatal(router.Run(":8080"))
 }
 
-func cleanPositions(positions []token.Position, tmpDir string) {
+func cleanPositions(positions []errnil.Position, tmpDir string) {
 	for idx := range positions {
 		positions[idx].Filename = strings.Replace(positions[idx].Filename, tmpDir+"/", "", 1)
 	}
