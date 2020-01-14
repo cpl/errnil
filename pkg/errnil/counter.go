@@ -1,136 +1,65 @@
 package errnil
 
 import (
-	"bufio"
-	"bytes"
-	"context"
 	"fmt"
-	"go/format"
-	"io/ioutil"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
-	"path"
+	stdpath "path"
 	"path/filepath"
-	"strings"
-	"sync/atomic"
-	"time"
 )
 
-const (
-	errNilString = "err != nil"
-	stopTimeout  = time.Second * 10
-)
+func Inspect(path string) ([]token.Position, error) {
+	var positions []token.Position
 
-type Counter struct {
-	workers int
-	count   uint32
+	if err := filepath.Walk(path, func(p string, f os.FileInfo, err error) error {
+		if f.IsDir() || stdpath.Ext(f.Name()) != ".go" {
+			return nil
+		}
 
-	input chan string
-	close chan interface{}
-	errch chan error
-}
+		fset := token.NewFileSet()
 
-func NewCounter(workers int) *Counter {
-	return &Counter{
-		workers: workers,
-		close:   make(chan interface{}),
-		input:   make(chan string, workers*100),
-		errch:   make(chan error, workers*10),
-	}
-}
+		fast, err := parser.ParseFile(fset, p, nil, parser.DeclarationErrors)
+		if err != nil {
+			return fmt.Errorf("failed parsing file, %w", err)
+		}
 
-func (c *Counter) Count(dir string) (uint32, error) {
-	for iter := 0; iter < c.workers; iter++ {
-		go c.work()
-	}
+		positions = append(positions, extractPositions(fset, fast)...)
 
-	if err := filepath.Walk(dir, c.visit); err != nil {
-		c.stop()
-		return 0, fmt.Errorf("failed walking path, %w", err)
-	}
-
-	if err := c.stop(); err != nil {
-		return 0, fmt.Errorf("failed closing workers, %w", err)
-	}
-
-	return atomic.LoadUint32(&c.count), nil
-}
-
-func (c *Counter) visit(p string, f os.FileInfo, err error) error {
-	if err != nil {
-		return err
-	}
-
-	if f.IsDir() || path.Ext(p) != ".go" {
 		return nil
+
+	}); err != nil {
+		return nil, fmt.Errorf("failed path traversal, %w", err)
 	}
 
-	select {
-	case err := <-c.errch:
-		return err
-	default:
-		c.input <- p
-		return nil
-	}
+	return positions, nil
 }
 
-func (c *Counter) stop() error {
-	ctx, _ := context.WithTimeout(context.Background(), stopTimeout)
-	for iter := 0; iter < c.workers; iter++ {
-		select {
-		case <-ctx.Done():
-			return fmt.Errorf("timeout trying to stop counter")
-		default:
-			c.close <- nil
-		}
-	}
-	return nil
-}
-
-func (c *Counter) work() {
-	for {
-		select {
-		case <-c.close:
-			return
-		case file := <-c.input:
-			source, err := ioutil.ReadFile(file)
-			if err != nil {
-				c.errch <- err
-				continue
+func extractPositions(tokenSet *token.FileSet, astFp *ast.File) (positions []token.Position) {
+	ast.Inspect(astFp, func(node ast.Node) bool {
+		switch n := node.(type) {
+		case *ast.BinaryExpr:
+			if n.Op != token.NEQ {
+				break
+			}
+			x, ok := n.X.(*ast.Ident)
+			if !ok {
+				break
+			}
+			y, ok := n.Y.(*ast.Ident)
+			if !ok {
+				break
 			}
 
-			source, err = format.Source(source)
-			if err != nil {
-				c.errch <- err
-				continue
+			if (x.Name == "err" && y.Name == "nil") || (x.Name == "nil" && y.Name == "err") {
+				pos := tokenSet.PositionFor(n.Pos(), true)
+				positions = append(positions, pos)
 			}
-
-			count, err := countErrNil(source)
-			if err != nil {
-				c.errch <- err
-				continue
-			}
-
-			atomic.AddUint32(&c.count, count)
 		}
-	}
-}
 
-// TODO: add checks against comments and fake Go files
-func countErrNil(source []byte) (uint32, error) {
-	scanner := bufio.NewScanner(bytes.NewBuffer(source))
-	scanner.Split(bufio.ScanLines)
+		return true
+	})
 
-	var count uint32
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, errNilString) {
-			count++
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return 0, fmt.Errorf("failed scanning source, %w", err)
-	}
-
-	return count, nil
+	return
 }

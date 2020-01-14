@@ -2,24 +2,18 @@ package main
 
 import (
 	"fmt"
-	"runtime"
+	"os"
 
 	"cpl.li/go/errnil/pkg/errnil"
 )
 
 func main() {
-	counter := errnil.NewCounter(runtime.NumCPU())
-
-	// testing with downloading packages in order to offer this as a service
-	//dir, err := errnil.Download("go.uber.org/zap", path.Join(os.TempDir(), "errnil"))
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Println(dir)
-
-	count, err := counter.Count(".")
+	positions, err := errnil.Inspect(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(count)
+
+	for _, pos := range positions {
+		fmt.Printf("%s:%d:%d\n", pos.Filename, pos.Line, pos.Column)
+	}
 }
