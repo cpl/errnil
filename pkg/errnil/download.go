@@ -8,7 +8,10 @@ import (
 	"golang.org/x/tools/go/vcs"
 )
 
-func Download(repo, destination string) (string, error) {
+// Download will take the given package repository and download it to a destination. The returned value is the final
+// path containing the package and including the parent directories. If the package already exists on disk, then it will
+// be updated.
+func Download(repo, destination string) (downloadPath string, err error) {
 	return download(repo, destination)
 }
 

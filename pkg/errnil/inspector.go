@@ -10,7 +10,15 @@ import (
 	"path/filepath"
 )
 
-func Inspect(path string) ([]token.Position, error) {
+// Inspect will traverse the entire path searching for .go source files and extracting all the positions containing
+// an ast.BinaryExpr with a not-equals operation and two ast.Ident where one must be `nil` and the other must be named
+// `err`. This does not check that `err` is of type `error`, so any variable named `err` is counted and any variable
+// that is an `error` but named something else, is skipped.
+func Inspect(path string) (positions []token.Position, err error) {
+	return inspect(path)
+}
+
+func inspect(path string) ([]token.Position, error) {
 	var positions []token.Position
 
 	if err := filepath.Walk(path, func(p string, f os.FileInfo, err error) error {
