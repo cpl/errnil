@@ -11,23 +11,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	// setup download path
-	downloadDir := os.Getenv("ERRNIL_DOWNLOAD_DIR")
-	if downloadDir == "" {
-		downloadDir = path.Join(os.TempDir(), "errnil")
-	}
+const (
+	shieldsEndpoint = "https://img.shields.io/static/v1"
+	badgeColor      = "e44"
+	badgeLabel      = "err != nil"
+)
 
+func main() {
+	downloadDir := path.Join(os.TempDir(), "errnil")
 	storage := store.NewPrimitiveStore()
 
-	// setup web server
 	router := gin.New()
 	router.Use(gin.Recovery())
-	router.GET("/health", handleHealth)
-	router.Use(gin.Logger())
 
-	router.GET("/inspect", handleInspect(downloadDir, storage, time.Minute))
+	api := router.Group("/api")
+	{
+		api.GET("/health", handleHealth)
+		api.GET("/inspect", handleInspect(downloadDir, storage, time.Minute))
+		api.GET("/badge", handleBadge(storage))
+	}
 
-	// start web server
 	log.Fatal(router.Run(":8080"))
 }

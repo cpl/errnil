@@ -1,8 +1,7 @@
 package main
 
 import (
-	"errors"
-	"log"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -31,11 +30,7 @@ func handleInspect(downloadDir string, storage store.Store, cacheDuration time.D
 
 		// check for cached entry
 		entry, err := storage.GetEntry(repo)
-		if err != nil {
-			if !errors.Is(err, store.ErrRepoNotFound) {
-				log.Printf("failed getting repo(%s) from store, %s\n", repo, err.Error())
-			}
-		} else {
+		if err == nil {
 			if time.Now().UTC().Sub(entry.UpdatedAt) < cacheDuration {
 				c.JSON(http.StatusOK, entry)
 				return
@@ -48,9 +43,45 @@ func handleInspect(downloadDir string, storage store.Store, cacheDuration time.D
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
+			return
 		}
 
 		c.JSON(http.StatusOK, entry)
 	}
+}
 
+func handleBadge(storage store.Store) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		// get repo name
+		repo := c.Query("repo")
+		if repo == "" {
+			c.Redirect(http.StatusTemporaryRedirect,
+				fmt.Sprintf("%s?label=%s&message=missing repo&color=critical&style=%s",
+					shieldsEndpoint,
+					badgeLabel,
+					c.Query("style"),
+				))
+			return
+		}
+
+		entry, err := storage.GetEntry(repo)
+		if err != nil {
+			c.Redirect(http.StatusTemporaryRedirect,
+				fmt.Sprintf("%s?label=%s&message=nil&color=inactive&style=%s",
+					shieldsEndpoint,
+					badgeLabel,
+					c.Query("style"),
+				))
+			return
+		}
+
+		c.Redirect(http.StatusTemporaryRedirect,
+			fmt.Sprintf("%s?label=%s&message=%d&color=%s&style=%s",
+				shieldsEndpoint,
+				badgeLabel,
+				entry.PositionsCount,
+				badgeColor,
+				c.Query("style"),
+			))
+	}
 }
