@@ -30,7 +30,7 @@ func (p PrimitiveStore) GetPositions(repo string) ([]errnil.Position, error) {
 
 	positions, ok := p.data[repo]
 	if !ok {
-		return []errnil.Position{}, nil
+		return nil, ErrRepoNotFound
 	}
 
 	return positions, nil
@@ -42,7 +42,7 @@ func (p PrimitiveStore) GetPositionsCount(repo string) (int, error) {
 
 	positions, ok := p.data[repo]
 	if !ok {
-		return 0, nil
+		return -1, ErrRepoNotFound
 	}
 
 	return len(positions), nil
