@@ -1,17 +1,8 @@
 package store
 
-import (
-	"errors"
-
-	"cpl.li/go/errnil/pkg/errnil"
-)
+import "cpl.li/go/errnil/pkg/errnil"
 
 type Store interface {
-	SetPositions(repo string, positions []errnil.Position) error
-	GetPositions(repo string) ([]errnil.Position, error)
-	GetPositionsCount(repo string) (int, error)
+	SetEntry(repo string, positions []errnil.Position) (Entry, error)
+	GetEntry(repo string) (Entry, error)
 }
-
-var (
-	ErrRepoNotFound = errors.New("repo not found")
-)

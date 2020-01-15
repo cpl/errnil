@@ -2,48 +2,45 @@ package store
 
 import (
 	"sync"
+	"time"
 
 	"cpl.li/go/errnil/pkg/errnil"
 )
 
 type PrimitiveStore struct {
 	dataLock sync.RWMutex
-	data     map[string][]errnil.Position
+	data     map[string]Entry
 }
 
 func NewPrimitiveStore() Store {
 	return &PrimitiveStore{
-		data: make(map[string][]errnil.Position),
+		data: make(map[string]Entry),
 	}
 }
 
-func (p PrimitiveStore) SetPositions(repo string, positions []errnil.Position) error {
+func (p PrimitiveStore) SetEntry(repo string, positions []errnil.Position) (Entry, error) {
 	p.dataLock.Lock()
 	defer p.dataLock.Unlock()
-	p.data[repo] = positions
-	return nil
+
+	entry := Entry{
+		UpdatedAt:      time.Now().UTC(),
+		Repo:           repo,
+		Positions:      positions,
+		PositionsCount: len(positions),
+	}
+	p.data[repo] = entry
+
+	return entry, nil
 }
 
-func (p PrimitiveStore) GetPositions(repo string) ([]errnil.Position, error) {
+func (p PrimitiveStore) GetEntry(repo string) (Entry, error) {
 	p.dataLock.RLock()
 	defer p.dataLock.RUnlock()
 
-	positions, ok := p.data[repo]
+	entry, ok := p.data[repo]
 	if !ok {
-		return nil, ErrRepoNotFound
+		return Entry{}, ErrRepoNotFound
 	}
 
-	return positions, nil
-}
-
-func (p PrimitiveStore) GetPositionsCount(repo string) (int, error) {
-	p.dataLock.RLock()
-	defer p.dataLock.RUnlock()
-
-	positions, ok := p.data[repo]
-	if !ok {
-		return -1, ErrRepoNotFound
-	}
-
-	return len(positions), nil
+	return entry, nil
 }
