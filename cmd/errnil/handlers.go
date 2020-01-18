@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -47,26 +46,5 @@ func handleInspect(downloadDir string, storage store.Store, cacheDuration time.D
 		}
 
 		c.JSON(http.StatusOK, entry)
-	}
-}
-
-func handleBadge(storage store.Store) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		repo := c.Query("repo")
-		if repo == "" {
-			c.Redirect(http.StatusTemporaryRedirect,
-				fmtBadgeURL("missing repo", "critical", c.Query("style")))
-			return
-		}
-
-		entry, err := storage.GetEntry(repo)
-		if err != nil {
-			c.Redirect(http.StatusTemporaryRedirect,
-				fmtBadgeURL("nil", "incative", c.Query("style")))
-			return
-		}
-
-		c.Redirect(http.StatusTemporaryRedirect,
-			fmtBadgeURL(strconv.Itoa(entry.PositionsCount), badgeColor, c.Query("style")))
 	}
 }

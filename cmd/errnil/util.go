@@ -11,17 +11,6 @@ import (
 	"cpl.li/go/errnil/pkg/errnil"
 )
 
-const (
-	shieldsEndpoint = "https://img.shields.io/static/v1"
-	badgeColor      = "e44"
-	badgeLabel      = "err != nil"
-)
-
-func fmtBadgeURL(message, color, style string) string {
-	return fmt.Sprintf("%s?label=%s&message=%s&color=%s&style=%s",
-		shieldsEndpoint, badgeLabel, message, color, style)
-}
-
 func env(key, def string) string {
 	value := os.Getenv(key)
 	if value == "" {

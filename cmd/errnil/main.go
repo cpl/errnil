@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"cpl.li/go/errnil/pkg/badger"
 	"cpl.li/go/errnil/pkg/store"
 )
 
@@ -22,7 +23,7 @@ func main() {
 	{
 		api.GET("/health", handleHealth)
 		api.GET("/inspect", handleInspect(downloadDir, storage, time.Minute))
-		api.GET("/badge", handleBadge(storage))
+		api.GET("/badge", badger.Badge(storage))
 	}
 
 	log.Fatal(router.Run(
