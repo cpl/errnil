@@ -8,13 +8,14 @@ import (
 )
 
 type PrimitiveStore struct {
-	dataLock sync.RWMutex
+	dataLock *sync.RWMutex
 	data     map[string]Entry
 }
 
 func NewPrimitiveStore() Store {
 	return &PrimitiveStore{
-		data: make(map[string]Entry),
+		dataLock: new(sync.RWMutex),
+		data:     make(map[string]Entry),
 	}
 }
 
