@@ -12,3 +12,7 @@ before_script:
 
 script:
   - make
+
+after_success:
+  - mv out/cover.out coverage.txt
+  - bash <(curl -s https://codecov.io/bash)
