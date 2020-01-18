@@ -25,5 +25,6 @@ func main() {
 		api.GET("/badge", handleBadge(storage))
 	}
 
-	log.Fatal(router.Run(env("ERRNIL_ADDRESS", ":8080")))
+	log.Fatal(router.Run(
+		env("ERRNIL_ADDRESS", "") + ":" + env("PORT", "8080")))
 }
