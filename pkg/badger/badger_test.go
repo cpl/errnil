@@ -30,7 +30,7 @@ func TestBadger(t *testing.T) {
 	req, _ = http.NewRequest(http.MethodGet, "/badge?repo=cpl.li/go/alpha&style=testing", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, newBadge("nil", "incative", "testing", true).JSON()+"\n", w.Body.String())
+	assert.Equal(t, newBadge("?", "inactive", "testing", true).JSON()+"\n", w.Body.String())
 
 	storage.SetEntry("cpl.li/go/alpha", []errnil.Position{
 		{

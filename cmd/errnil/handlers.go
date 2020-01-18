@@ -12,39 +12,58 @@ import (
 func handleHealth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "ok",
-		"timestamp": time.Now().Unix(),
+		"timestamp": time.Now().UTC().Unix(),
 	})
 }
 
-func handleInspect(downloadDir string, storage store.Store, cacheDuration time.Duration) func(c *gin.Context) {
+func handleGetEntry(storage store.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// get repo name
 		repo := c.Query("repo")
 		if repo == "" {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": "missing repo query argument",
 			})
 			return
 		}
 
-		// check for cached entry
 		entry, err := storage.GetEntry(repo)
-		if err == nil {
-			if time.Now().UTC().Sub(entry.UpdatedAt) < cacheDuration {
-				c.JSON(http.StatusOK, entry)
-				return
-			}
-		}
-
-		// get and update entry
-		entry, err = downloadInspectStore(repo, downloadDir, storage)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error": "entry not found in storage, " + err.Error(),
 			})
 			return
 		}
 
 		c.JSON(http.StatusOK, entry)
+	}
+}
+
+func handleInspect(downloadDir string, storage store.Store, cacheDuration time.Duration) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		repo := c.Query("repo")
+		if repo == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": "missing repo query argument",
+			})
+			return
+		}
+
+		entry, err := storage.GetEntry(repo)
+		if err == nil {
+			if time.Now().UTC().Sub(entry.UpdatedAt) < cacheDuration {
+				c.Next()
+				return
+			}
+		}
+
+		_, err = downloadInspectStore(repo, downloadDir, storage)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.Next()
 	}
 }

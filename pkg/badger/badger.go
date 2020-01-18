@@ -41,7 +41,7 @@ func newBadge(message, color, style string, isErr bool) badge {
 }
 
 // Badge builds a shields.io endpoint for generating errnil counter badges.
-func Badge(storage store.Store) func(c *gin.Context) {
+func Badge(storage store.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		repo := c.Query("repo")
 		style := c.Query("style")
@@ -55,7 +55,7 @@ func Badge(storage store.Store) func(c *gin.Context) {
 		entry, err := storage.GetEntry(repo)
 		if err != nil {
 			c.JSON(http.StatusOK,
-				newBadge("nil", "incative", style, true))
+				newBadge("?", "inactive", style, true))
 			return
 		}
 

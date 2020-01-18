@@ -22,8 +22,8 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/health", handleHealth)
-		api.GET("/inspect", handleInspect(downloadDir, storage, time.Minute))
-		api.GET("/badge", badger.Badge(storage))
+		api.GET("/inspect", handleInspect(downloadDir, storage, time.Minute*5), handleGetEntry(storage))
+		api.GET("/badge", handleInspect(downloadDir, storage, time.Minute*5), badger.Badge(storage))
 	}
 
 	log.Fatal(router.Run(
