@@ -1,8 +1,6 @@
-<form>
-    <div class="form-group">
-        <h1> err != nil </h1>
-        <label for="repoInput">Enter the <b>go get</b> path for the repo you want to inspect</label>
-        <input type="text" class="form-control" id="repoInput" placeholder="cpl.li/go/errnil"/>
-    </div>
-    <button type="submit" class="btn btn-lg btn-info">Inspect</button>
-</form>
+<div class="form-group">
+    <h1> err != nil </h1>
+    <label for="repoInput">Enter the <b>go get</b> path for the repo you want to inspect</label>
+    <input type="text" class="form-control" id="repoInput" placeholder="cpl.li/go/errnil"/>
+</div>
+<button type="button" class="btn btn-lg btn-info" onclick="window.location.assign('/results?repo=' + document.getElementById('repoInput').value);">Inspect</button>
