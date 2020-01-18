@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/yeti/bootstrap.min.css" rel="stylesheet" integrity="sha384-bWm7zrSUE5E+21rA9qdH5frkMpXvqjQm/WJw4L5PYQLNHrywI5zs5saEjIcCdGu1" crossorigin="anonymous">
+
+    <title>errnil, err != nil</title>
+  </head>
+  <body>
+    {{include "layouts/navbar"}}
+    <br/>
+
+    <div class="jumbotron">
+      <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+          {{template "reporesults" .}}
+        </div>
+        <div class="col-3"></div>
+      </div>
+    </div>
+
+    {{include "layouts/footer"}}
+
+  </body>
+</html>

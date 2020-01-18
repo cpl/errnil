@@ -1,0 +1,14 @@
+{{define "reporesults"}}
+<div class="container">
+  <h1> <span class="badge badge-danger"> {{ .positionCount }} </span> {{ .repo }} </h1>
+  <hr/>
+
+  <ul class="list-group">
+    {{ range $index, $position := .positions }}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ $position.Filename }}:{{ $position.Line }}:{{ $position.Column }}
+      </li>
+    {{end}}
+  </ul>
+</div>
+{{end}}
