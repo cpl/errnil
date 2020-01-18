@@ -1,4 +1,5 @@
 # `err != nil`
 
-[![Go Report Card](https://goreportcard.com/badge/cpl.li/go/errnil)](https://goreportcard.com/report/cpl.li/go/errnil)
+[![Go Report Card](https://goreportcard.com/badge/cpl.li/go/errnil?style=flat-square)](https://goreportcard.com/report/cpl.li/go/errnil)
 [![Build Status](https://img.shields.io/travis/cpl/errnil/master?style=flat-square)](https://travis-ci.org/cpl/errnil)
+[![Build Status](https://errnil.cpl.li/api/badge?repo=cpl.li/go/errnil&style=flat-square)]()
