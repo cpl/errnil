@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -19,6 +20,14 @@ const (
 func fmtBadgeURL(message, color, style string) string {
 	return fmt.Sprintf("%s?label=%s&message=%s&color=%s&style=%s",
 		shieldsEndpoint, badgeLabel, message, color, style)
+}
+
+func env(key, def string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return def
+	}
+	return value
 }
 
 func countSourceFiles(positions []errnil.Position) map[string]int {

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	downloadDir := path.Join(os.TempDir(), "errnil")
+	downloadDir := env("ERRNIL_DOWNLOAD_DIR", path.Join(os.TempDir(), "errnil"))
 	storage := store.NewPrimitiveStore()
 
 	router := gin.New()
@@ -25,5 +25,5 @@ func main() {
 		api.GET("/badge", handleBadge(storage))
 	}
 
-	log.Fatal(router.Run(":8080"))
+	log.Fatal(router.Run(env("ERRNIL_ADDRESS", ":8080")))
 }
