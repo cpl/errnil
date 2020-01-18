@@ -11,7 +11,7 @@ import (
 func TestInspector(t *testing.T) {
 	t.Parallel()
 
-	tmpDir := path.Join(os.TempDir(), "errnil_test")
+	tmpDir := path.Join(os.TempDir(), "errnil_inspector_test")
 	assert.NoError(t, os.MkdirAll(tmpDir, 0766))
 	defer os.RemoveAll(tmpDir)
 
