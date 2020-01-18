@@ -6,15 +6,9 @@ import (
 	"path"
 	"time"
 
-	"cpl.li/go/errnil/pkg/store"
-
 	"github.com/gin-gonic/gin"
-)
 
-const (
-	shieldsEndpoint = "https://img.shields.io/static/v1"
-	badgeColor      = "e44"
-	badgeLabel      = "err != nil"
+	"cpl.li/go/errnil/pkg/store"
 )
 
 func main() {

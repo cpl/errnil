@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
-	"cpl.li/go/errnil/pkg/store"
-
 	"github.com/gin-gonic/gin"
+
+	"cpl.li/go/errnil/pkg/store"
 )
 
 func handleHealth(c *gin.Context) {
@@ -52,36 +52,21 @@ func handleInspect(downloadDir string, storage store.Store, cacheDuration time.D
 
 func handleBadge(storage store.Store) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		// get repo name
 		repo := c.Query("repo")
 		if repo == "" {
 			c.Redirect(http.StatusTemporaryRedirect,
-				fmt.Sprintf("%s?label=%s&message=missing repo&color=critical&style=%s",
-					shieldsEndpoint,
-					badgeLabel,
-					c.Query("style"),
-				))
+				fmtBadgeURL("missing repo", "critical", c.Query("style")))
 			return
 		}
 
 		entry, err := storage.GetEntry(repo)
 		if err != nil {
 			c.Redirect(http.StatusTemporaryRedirect,
-				fmt.Sprintf("%s?label=%s&message=nil&color=inactive&style=%s",
-					shieldsEndpoint,
-					badgeLabel,
-					c.Query("style"),
-				))
+				fmtBadgeURL("nil", "incative", c.Query("style")))
 			return
 		}
 
 		c.Redirect(http.StatusTemporaryRedirect,
-			fmt.Sprintf("%s?label=%s&message=%d&color=%s&style=%s",
-				shieldsEndpoint,
-				badgeLabel,
-				entry.PositionsCount,
-				badgeColor,
-				c.Query("style"),
-			))
+			fmtBadgeURL(strconv.Itoa(entry.PositionsCount), badgeColor, c.Query("style")))
 	}
 }
