@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"cpl.li/go/errnil/pkg/store"
 
@@ -13,6 +14,7 @@ import (
 const (
 	badgeColor = "e44"
 	badgeLabel = "err != nil"
+	badgeStyle = "flat"
 )
 
 type badge struct {
@@ -30,6 +32,10 @@ func (b badge) JSON() string {
 }
 
 func newBadge(message, color, style string, isErr bool) badge {
+	if strings.TrimSpace(style) == "" {
+		style = badgeStyle
+	}
+
 	return badge{
 		SchemaVersion: 1,
 		Label:         badgeLabel,

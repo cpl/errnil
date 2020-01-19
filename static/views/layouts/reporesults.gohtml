@@ -1,6 +1,19 @@
 {{define "reporesults"}}
 <div class="container">
-  <h1> <span class="badge badge-danger"> {{ .positionCount }} </span> {{ .repo }} </h1>
+  <h1> {{ .repo }} </h1>
+  <img src="{{ .imageURL }}"/>
+  <hr/>
+
+  <p>Markdown: </p>
+  <pre><code>
+{{ .markdown }}
+  </code></pre>
+
+  <p>ImageURL: </p>
+  <pre><code>
+{{ .imageURL }}
+  </code></pre>
+
   <hr/>
 
   <ul class="list-group">

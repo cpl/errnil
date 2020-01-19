@@ -66,6 +66,8 @@ func main() {
 			"positionCount": entry.PositionsCount,
 			"positions":     entry.Positions,
 			"updatedAt":     entry.UpdatedAt,
+			"markdown":      badger.ToMarkdown(repo, c.Query("style")),
+			"imageURL":      badger.ImageURL(repo, c.Query("style")),
 		})
 	})
 
